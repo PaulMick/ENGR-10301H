@@ -1,0 +1,10 @@
+aruco generate --dict {family} --id {id} --save --noshow
+DICT_4X4_50
+
+aruco generate --dict DICT_4X4_50 --id  --save --noshow --addhalfmarks
+
+aruco collect --width 9 --height 7 --squaresize 20
+
+aruco calibrate --cameraname MSMF --maxfiles
+
+aruco detect --dict DICT_4X4_50

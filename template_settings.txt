@@ -1,0 +1,19 @@
+{
+    "camera_settings": {
+        "camera_name": str,
+        "matrix_coefficients": list[list[float]], // 3x3 matrix
+        "distortion_coefficients": list[float]
+    },
+    "marker_settings": {
+        "marker_family": str, // e.g. "DICT_4X4_50"
+        "marker_length": float, // marker side length in meters, measured on outside of black square
+        "waypoint_markers": [
+            {
+                "id": int,
+                "pose_transform": list[list[float]] // 3x3 3D transform matrix of the marker, use generate_waypoint_transform.py to generate
+            },
+            ...
+        ],
+        "marker_of_interest_id": int // ID of the marker to be tracked
+    }
+}
