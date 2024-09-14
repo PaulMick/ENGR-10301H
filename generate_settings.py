@@ -20,22 +20,25 @@ settings = {
 
 camera_name = cv2.VideoCapture(0).getBackendName()
 
-settings["camera_settings"]["camera_name"] = camera_name
+calibrate_camera = input("Calibrate camera? (y/n): ").lower()
 
-checkerboard_width = int(input("Checkerboard width (count): "))
-checkerboard_height = int(input("Checkerboard height (count): "))
-checkerboard_size = float(input("Checkerboard square size (mm): "))
+if calibrate_camera == "y":
+    
+    checkerboard_width = int(input("Checkerboard width (count): "))
+    checkerboard_height = int(input("Checkerboard height (count): "))
+    checkerboard_size = float(input("Checkerboard square size (mm): "))
 
-print("Collecting calibration data, hold up checkerboard to camera")
+    print("Collecting calibration data, hold up checkerboard to camera")
 
-os.system(f"aruco collect --width {checkerboard_width} --height {checkerboard_height} --squaresize {checkerboard_size}")
+    os.system(f"aruco collect --width {checkerboard_width} --height {checkerboard_height} --squaresize {checkerboard_size}")
 
-num_calibration_files = int(input("Num. files to use for calibration (40-80 reccommended): "))
+    num_calibration_files = int(input("Num. files to use for calibration (40-80 reccommended): "))
 
-os.system(f"aruco calibrate --cameraname {camera_name} --maxfiles {num_calibration_files}")
+    os.system(f"aruco calibrate --cameraname {camera_name} --maxfiles {num_calibration_files}")
 
 camera_settings = aruco_markers.load_camera_parameters(camera_name)
 
+settings["camera_settings"]["camera_name"] = camera_name
 settings["camera_settings"]["matrix_coefficients"] = camera_settings[0].tolist()
 settings["camera_settings"]["distortion_coefficients"] = camera_settings[1].tolist()[0]
 
