@@ -167,3 +167,6 @@ aruco_markers_data/
 
 # settings files
 settings/
+
+# test script
+./test.py

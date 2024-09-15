@@ -37,16 +37,17 @@ def estimateMarkerPoses(frame, corners, ids):
     pose_estimations = []
     if len(corners) > 0:
         for i in range(len(ids)):
-            if ids[i][0] in valid_marker_ids:
-                rvec, tvec, marker_points = aruco.estimatePoseSingleMarkers(corners[i], marker_length, matrix_coefs, distortion_coefs)
-                # print(f"rvec: {rvec}, tvec: {tvec}, marker_points: {marker_points}")
-                print(f"[{(ids[i][0])}] Dist z: {tvec[0][0][2]}")
-                pose_estimations.append({
-                    "id": int(ids[i][0]),
-                    "trans_vec": list(tvec[0][0]),
-                    "rot_vec": list(rvec[0][0])
-                })
-                cv2.drawFrameAxes(frame, matrix_coefs, distortion_coefs, rvec, tvec, marker_length)
+            if not ids[i][0] in valid_marker_ids:
+                continue
+            rvec, tvec, marker_points = aruco.estimatePoseSingleMarkers(corners[i], marker_length, matrix_coefs, distortion_coefs)
+            # print(f"rvec: {rvec}, tvec: {tvec}, marker_points: {marker_points}")
+            print(f"[{(ids[i][0])}] Dist z: {tvec[0][0][2]}")
+            pose_estimations.append({
+                "id": int(ids[i][0]),
+                "trans_vec": list(tvec[0][0]),
+                "rot_vec": list(rvec[0][0])
+            })
+            cv2.drawFrameAxes(frame, matrix_coefs, distortion_coefs, rvec, tvec, marker_length)
     return pose_estimations
 
 while True:
