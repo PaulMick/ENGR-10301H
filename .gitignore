@@ -130,6 +130,7 @@ ENV/
 env.bak/
 venv.bak/
 tag_tracking_env/
+tag-tracking-env/
 
 # Spyder project settings
 .spyderproject
