@@ -73,9 +73,9 @@ for i in range(1, num_waymarkers + 1):
             "x": float,
             "y": float,
             "z": float,
-            "roll": float,
-            "pitch": float,
-            "yaw": float
+            "rx": float,
+            "ry": float,
+            "rz": float
         }
     }
 
@@ -83,9 +83,9 @@ for i in range(1, num_waymarkers + 1):
     waymarker["pose"]["x"] = float(input("x: "))
     waymarker["pose"]["y"] = float(input("y: "))
     waymarker["pose"]["z"] = float(input("z: "))
-    waymarker["pose"]["roll"] = float(input("roll: "))
-    waymarker["pose"]["pitch"] = float(input("pitch: "))
-    waymarker["pose"]["yaw"] = float(input("yaw: "))
+    waymarker["pose"]["rx"] = float(input("rx: "))
+    waymarker["pose"]["ry"] = float(input("ry: "))
+    waymarker["pose"]["rz"] = float(input("rz: "))
 
     settings["marker_settings"]["waypoint_markers"].append(waymarker)
 

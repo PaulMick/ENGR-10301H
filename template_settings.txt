@@ -10,7 +10,14 @@
         "waypoint_markers": [
             {
                 "id": int,
-                "pose_transform": list[list[float]] // 3x3 3D transform matrix of the marker, use generate_waypoint_transform.py to generate
+                "pose": {
+                    "x": float,
+                    "y": float,
+                    "z": float,
+                    "rx": float,
+                    "ry": float,
+                    "rz": float
+                }
             },
             ...
         ],
