@@ -9,8 +9,7 @@ parser.add_argument("settings", help = "settings file to use for tracking")
 args = parser.parse_args()
 
 settings_file_name = args.settings
-in_file = open(f"settings\\{settings_file_name}.json")
-
+in_file = open(f"/aruco/ENGR-10301H/settings/{settings_file_name}.json")
 settings = json.load(in_file)
 
 marker_length = settings["marker_settings"]["marker_length"]
@@ -38,9 +37,10 @@ def estimateMarkerPoses(frame, corners, ids):
     if len(corners) > 0:
         for i in range(len(ids)):
             if not ids[i][0] in valid_marker_ids:
+                print(f"Invalid tag ID: {ids[i][0]}")
                 continue
             rvec, tvec, marker_points = aruco.estimatePoseSingleMarkers(corners[i], marker_length, matrix_coefs, distortion_coefs)
-            # print(f"rvec: {rvec}, tvec: {tvec}, marker_points: {marker_points}")
+            #print(f"rvec: {rvec}, tvec: {tvec}, marker_points: {marker_points}")
             print(f"[{(ids[i][0])}] Dist z: {tvec[0][0][2]}")
             pose_estimations.append({
                 "id": int(ids[i][0]),
@@ -55,7 +55,7 @@ while True:
 
     detections = findArucoMarkers(frame)
     marker_poses = estimateMarkerPoses(frame, detections[0], detections[1])
-    # print(marker_poses)
+    #print(marker_poses)
 
     cv2.imshow("Feed", frame)
     if cv2.waitKey(1) & 0xFF == ord("q"):

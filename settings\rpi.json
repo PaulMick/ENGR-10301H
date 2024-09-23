@@ -1,0 +1,35 @@
+{
+  "camera_settings": {
+    "camera_name": "V4L2",
+    "matrix_coefficients": [
+      [
+        576.3797408657605,
+        0.0,
+        312.554368084172
+      ],
+      [
+        0.0,
+        577.7382390702165,
+        228.40304249901672
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "distortion_coefficients": [
+      0.10674254503775507,
+      -0.41364688149347906,
+      -0.008548737237393607,
+      -0.00389042251055275,
+      0.45391999114700887
+    ]
+  },
+  "marker_settings": {
+    "marker_family": "DICT_4X4_50",
+    "marker_length": 0.05,
+    "waypoint_markers": [],
+    "marker_of_interest_id": 0
+  }
+}

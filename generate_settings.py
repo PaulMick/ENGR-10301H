@@ -91,7 +91,7 @@ for i in range(1, num_waymarkers + 1):
 
 settings_file_name = input("Name of settings file: ")
 
-out_file = open(f"settings\\{settings_file_name}.json", "w")
+out_file = open(f"/aruco/ENGR-10301H/settings/{settings_file_name}.json", "w")
 json.dump(settings, out_file, indent = 2)
 out_file.close()
 print(f"{settings_file_name}.json created successfully under ./settings!")
