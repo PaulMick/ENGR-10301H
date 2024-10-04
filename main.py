@@ -5,14 +5,22 @@ import json
 import numpy as np
 import statistics as stats
 import pose_solver
+import platform
 
 parser = argparse.ArgumentParser(description = "Tracks a single aruco marker with other markers as points of reference")
 parser.add_argument("settings", help = "settings file to use for tracking")
 args = parser.parse_args()
 
 settings_file_name = args.settings
-# in_file = open(f"/aruco/ENGR-10301H/settings/{settings_file_name}.json") # for linux
-in_file = open(f"settings/{settings_file_name}.json") # for windows
+
+if platform.system() == "Windows":
+    in_file = open(f"settings/{settings_file_name}.json")
+elif platform.system() == "Linux":
+    in_file = open(f"/aruco/ENGR-10301H/settings/{settings_file_name}.json")
+else:
+    print("Unrecognized OS")
+    exit(1)
+
 settings = json.load(in_file)
 
 marker_length = settings["marker_settings"]["marker_length"]
