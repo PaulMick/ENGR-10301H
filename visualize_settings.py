@@ -4,14 +4,22 @@ from math import pi
 import matplotlib.pyplot as plt
 import json
 import argparse
+import platform
 
-parser = argparse.ArgumentParser(description = "Tracks a single aruco marker with other markers as points of reference")
-parser.add_argument("settings", help = "settings file to use for tracking")
+parser = argparse.ArgumentParser(description = "Visualizes the waypoint markers of a settings file")
+parser.add_argument("settings", help = "settings file to use for visualization")
 args = parser.parse_args()
 
 settings_file_name = args.settings
-# in_file = open(f"/aruco/ENGR-10301H/settings/{settings_file_name}.json") # for linux
-in_file = open(f"settings/{settings_file_name}.json") # for windows
+
+if platform.system() == "Windows":
+    in_file = open(f"settings/{settings_file_name}.json")
+elif platform.system() == "Linux":
+    in_file = open(f"/aruco/ENGR-10301H/settings/{settings_file_name}.json")
+else:
+    print("Unrecognized OS")
+    exit(1)
+
 settings = json.load(in_file)
 
 def get_point(off_set_point: list[float], transform_mat: np.matrix) -> list[float]:
@@ -33,7 +41,9 @@ def plot_axis(transform_mat: np.matrix, label: str):
     z_points.append(origin)
     z_points.append(get_point([0, 0, 1], transform_mat))
     plot_3d.plot3D([p[0] for p in z_points], [p[1] for p in z_points], [p[2] for p in z_points], "green")
-    plot_3d.text(origin[0], origin[1], origin[2], label)
+    text = plot_3d.text(origin[0], origin[1], origin[2], label)
+    text.set_bbox(dict(facecolor = "black", alpha = 0.3, edgecolor = "white", linewidth = 0))
+    text.set_color("white")
 
 plot_3d = plt.axes(projection = "3d")
 
@@ -50,8 +60,8 @@ plot_3d.set_title("World View")
 plot_3d.set_xlabel("X")
 plot_3d.set_ylabel("Y")
 plot_3d.set_zlabel("Z")
-plot_3d.set_xlim3d(-5, 5)
-plot_3d.set_ylim3d(-5, 5)
-plot_3d.set_zlim3d(0, 10)
+plot_3d.set_xlim3d(-3, 3)
+plot_3d.set_ylim3d(-3, 3)
+plot_3d.set_zlim3d(0, 6)
 
 plt.show()
