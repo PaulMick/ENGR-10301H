@@ -30,7 +30,7 @@ marker_in_world_pose = [1, 1, 1, 0, 0, 0]
 marker_in_cam_pose = [1, 0, 2, pi / 4, pi / 4, pi / 4]
 
 marker_to_world_mat = pose_solver.get_inverse_transformation_matrix(marker_in_world_pose)
-cam_to_world_mat = pose_solver.get_cam_pose_rel_world(marker_in_cam_pose, marker_in_world_pose)
+cam_to_world_mat = pose_solver.get_cam_to_world_transform(marker_in_cam_pose, marker_in_world_pose)
 
 plot_axis(np.identity(4), "World")
 plot_axis(marker_to_world_mat, "Marker")

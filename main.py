@@ -29,9 +29,11 @@ distortion_coefs = np.matrix(settings["camera_settings"]["distortion_coefficient
 valid_marker_ids = [settings["marker_settings"]["marker_of_interest_id"]]
 active_marker_id = settings["marker_settings"]["marker_of_interest_id"]
 waymarker_ids = []
+waymarker_world_poses = {}
 for waymarker in settings["marker_settings"]["waypoint_markers"]:
     valid_marker_ids.append(waymarker["id"])
     waymarker_ids.append(waymarker["id"])
+    waymarker_world_poses[waymarker["id"]] = waymarker["pose"]
 
 cam = cv2.VideoCapture(0)
 
@@ -78,9 +80,11 @@ def main():
         waymarker_poses = [pose for pose in marker_poses if pose["id"] in waymarker_ids]
         # print(waymarker_poses)
 
-        # camera_poses = []
-        # for p in waymarker_poses:
-        #     camera_poses.append(pose_solver.get_camera_pose_rel_world([p["trans_vec"][0], p["trans_vec"][1], p["trans_vec"][2], p["rot_vec"][0], p["rot_vec"][1], p["rot_vec"][2]]))
+        camera_poses = []
+        for p in waymarker_poses:
+            marker_in_world_pose = pose_solver.get_dict_pose_as_list(waymarker_world_poses[p["id"]])
+            camera_poses.append(list(np.matmul([0, 0, 0, 1], pose_solver.get_cam_to_world_transform(pose_solver.get_vec_pose_as_list(p), marker_in_world_pose))))
+        print(camera_poses)
 
         cv2.imshow("Calibration Feed", frame)
         if cv2.waitKey(1) & 0xFF == ord("q"):
