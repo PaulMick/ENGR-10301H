@@ -90,10 +90,11 @@ def main():
             cam_poses.append(list(np.matmul([0, 0, 0, 1], pose_solver.get_cam_to_world_transform(pose_solver.get_vec_pose_as_list(p), marker_in_world_pose))))
         # print(cam_poses)
 
-        avg_cam_pose = [[stats.mean(n) for n in pose] for pose in cam_poses]
-        print(avg_cam_pose)
+        if len(cam_poses) > 0:
+            avg_cam_pose = [[stats.mean([pose[i] for pose in cam_poses]) for i in range(3)]]
+            # print(avg_cam_pose)
 
-        data_points.append(avg_cam_pose)
+            data_points.append(avg_cam_pose)
 
         cv2.imshow("Calibration Feed", frame)
         if cv2.waitKey(1) & 0xFF == ord("q"):
@@ -101,7 +102,8 @@ def main():
 
     cv2.destroyAllWindows()
 
-    cam_in_world_pose = [[stats.mean(n) for n in pose] for pose in data_points]
+    # print(data_points)
+    cam_in_world_pose = [[stats.mean([pose[0][i] for pose in data_points]) for i in range(3)]]
     print(cam_in_world_pose)
 
     # Active tracking: tracks marker of interest in world space
