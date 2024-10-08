@@ -23,6 +23,7 @@ camera_name = cv2.VideoCapture(0).getBackendName()
 
 calibrate_camera = input("Calibrate camera? (y/n): ").lower()
 
+# Camera calibration
 if calibrate_camera == "y":
     
     checkerboard_width = int(input("Checkerboard width (count): "))
@@ -31,33 +32,38 @@ if calibrate_camera == "y":
 
     print("Collecting calibration data, hold up checkerboard to camera")
 
+    # Collect calibration frames
     os.system(f"aruco collect --width {checkerboard_width} --height {checkerboard_height} --squaresize {checkerboard_size}")
 
     num_calibration_files = int(input("Num. files to use for calibration (40-80 reccommended): "))
 
+    # Calibrate camera
     os.system(f"aruco calibrate --cameraname {camera_name} --maxfiles {num_calibration_files}")
 
+# Load camera calibration data
 camera_settings = aruco_markers.load_camera_parameters(camera_name)
 
 settings["camera_settings"]["camera_name"] = camera_name
 settings["camera_settings"]["matrix_coefficients"] = camera_settings[0].tolist()
 settings["camera_settings"]["distortion_coefficients"] = camera_settings[1].tolist()[0]
 
+# Family name of ArUco markers
 marker_family = input("Marker Family (e.g. DICT_4X4_50): ")
 assert marker_family in aruco_markers.ARUCO_DICT.keys()
-
 settings["marker_settings"]["marker_family"] = marker_family
 
+# Size of physical markers
 marker_length = float(input("Marker length (m): "))
-
 settings["marker_settings"]["marker_length"] = marker_length
 
+# ID of marker of interest
 interest_id = int(input("ID of marker of interest (int): "))
-
 settings["marker_settings"]["marker_of_interest_id"] = interest_id
 
+# Number of waypoint markers
 num_waymarkers = int(input("Number of waypoint markers (int): "))
 
+# Get IDs and 3D poses of waypoint markers
 for i in range(1, num_waymarkers + 1):
     suffix = "th"
     if i % 10 == 1:
@@ -90,6 +96,7 @@ for i in range(1, num_waymarkers + 1):
 
     settings["marker_settings"]["waypoint_markers"].append(waymarker)
 
+# Name of JSON settings file
 settings_file_name = input("Name of settings file: ")
 
 if platform.system() == "Windows":
@@ -100,6 +107,7 @@ else:
     print("Unrecognized OS")
     exit(1)
 
+# Write to JSON settings file
 json.dump(settings, out_file, indent = 2)
 out_file.close()
 print(f"{settings_file_name}.json created successfully under ./settings!")

@@ -11,6 +11,7 @@ parser = argparse.ArgumentParser(description = "Tracks a single aruco marker wit
 parser.add_argument("settings", help = "settings file to use for tracking")
 args = parser.parse_args()
 
+# Name of JSON settings file
 settings_file_name = args.settings
 
 if platform.system() == "Windows":
@@ -21,8 +22,10 @@ else:
     print("Unrecognized OS")
     exit(1)
 
+# JSON settings file
 settings = json.load(in_file)
 
+# Parsing marker information
 marker_length = settings["marker_settings"]["marker_length"]
 matrix_coefs = np.matrix(settings["camera_settings"]["matrix_coefficients"])
 distortion_coefs = np.matrix(settings["camera_settings"]["distortion_coefficients"])
@@ -40,7 +43,8 @@ cam = cv2.VideoCapture(0)
 aruco_dict = aruco.getPredefinedDictionary(0)
 aruco_params = aruco.DetectorParameters()
 
-def findArucoMarkers(frame):
+# Finds corners and ids of aruco markers in frame
+def findArucoMarkers(frame) -> list[list]:
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     corners, ids, rejected = aruco.detectMarkers(gray, aruco_dict, parameters = aruco_params)
 
@@ -48,16 +52,16 @@ def findArucoMarkers(frame):
 
     return [corners, ids]
 
-def estimateMarkerPoses(frame, corners, ids):
+# Estimates poses in camera space in frame
+def estimateMarkerPoses(frame, corners, ids) -> list[dict]:
     pose_estimations = []
     if len(corners) > 0:
         for i in range(len(ids)):
+            # Reject invalid ids
             if not ids[i][0] in valid_marker_ids:
                 print(f"Invalid tag ID: {ids[i][0]}")
                 continue
             rvec, tvec, marker_points = aruco.estimatePoseSingleMarkers(corners[i], marker_length, matrix_coefs, distortion_coefs)
-            #print(f"rvec: {rvec}, tvec: {tvec}, marker_points: {marker_points}")
-            # print(f"[{(ids[i][0])}] Dist z: {tvec[0][0][2]}")
             pose_estimations.append({
                 "id": int(ids[i][0]),
                 "trans_vec": list(tvec[0][0]),
@@ -70,21 +74,26 @@ def main():
     # Camera location calibration
     data_points = []
 
+    # Calibration phase: figures out where camera is in world space
     while len(data_points) < 1000:
         ret, frame = cam.read()
 
         detections = findArucoMarkers(frame)
-
         marker_poses = estimateMarkerPoses(frame, detections[0], detections[1])
 
         waymarker_poses = [pose for pose in marker_poses if pose["id"] in waymarker_ids]
         # print(waymarker_poses)
 
-        camera_poses = []
+        cam_poses = []
         for p in waymarker_poses:
             marker_in_world_pose = pose_solver.get_dict_pose_as_list(waymarker_world_poses[p["id"]])
-            camera_poses.append(list(np.matmul([0, 0, 0, 1], pose_solver.get_cam_to_world_transform(pose_solver.get_vec_pose_as_list(p), marker_in_world_pose))))
-        print(camera_poses)
+            cam_poses.append(list(np.matmul([0, 0, 0, 1], pose_solver.get_cam_to_world_transform(pose_solver.get_vec_pose_as_list(p), marker_in_world_pose))))
+        # print(cam_poses)
+
+        avg_cam_pose = [[stats.mean(n) for n in pose] for pose in cam_poses]
+        print(avg_cam_pose)
+
+        data_points.append(avg_cam_pose)
 
         cv2.imshow("Calibration Feed", frame)
         if cv2.waitKey(1) & 0xFF == ord("q"):
@@ -92,7 +101,10 @@ def main():
 
     cv2.destroyAllWindows()
 
-    # Active tracking
+    cam_in_world_pose = [[stats.mean(n) for n in pose] for pose in data_points]
+    print(cam_in_world_pose)
+
+    # Active tracking: tracks marker of interest in world space
     while True:
         ret, frame = cam.read()
 

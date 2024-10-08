@@ -10,6 +10,7 @@ parser = argparse.ArgumentParser(description = "Visualizes the waypoint markers 
 parser.add_argument("settings", help = "settings file to use for visualization")
 args = parser.parse_args()
 
+# Name of JSON settings file
 settings_file_name = args.settings
 
 if platform.system() == "Windows":
@@ -20,13 +21,16 @@ else:
     print("Unrecognized OS")
     exit(1)
 
+# JSON settings file
 settings = json.load(in_file)
 
+# Get the 3D point after applying 3D transformation matrix
 def get_point(off_set_point: list[float], transform_mat: np.matrix) -> list[float]:
     off_set_point.append(1)
     out = np.matmul(off_set_point, transform_mat)
     return [float(out[0]), float(out[1]), float(out[2])]
 
+# Plot X, Y, and Z axiis in world space given 3D transformation matrix
 def plot_axis(transform_mat: np.matrix, label: str):
     origin = get_point([0, 0, 0], transform_mat)
     x_points = []
@@ -47,6 +51,7 @@ def plot_axis(transform_mat: np.matrix, label: str):
 
 plot_3d = plt.axes(projection = "3d")
 
+# Plot axiis of each waypoint marker in world space
 for waymarker in settings["marker_settings"]["waypoint_markers"]:
     waymarker_in_world_pose = [waymarker["pose"]["x"], waymarker["pose"]["y"], waymarker["pose"]["z"], waymarker["pose"]["rx"], waymarker["pose"]["ry"], waymarker["pose"]["rz"]]
 
@@ -54,6 +59,7 @@ for waymarker in settings["marker_settings"]["waypoint_markers"]:
     
     plot_axis(marker_to_world_mat, waymarker["id"])
 
+# Plot world space axiis in world space
 plot_axis(np.identity(4), "World")
 
 plot_3d.set_title("World View")
