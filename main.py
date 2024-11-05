@@ -6,6 +6,8 @@ import numpy as np
 import statistics as stats
 import pose_solver
 import platform
+from kaspersmicrobit import KaspersMicrobit
+import time
 
 parser = argparse.ArgumentParser(description = "Tracks a single aruco marker with other markers as points of reference")
 parser.add_argument("settings", help = "settings file to use for tracking")
@@ -107,15 +109,20 @@ def main():
     print(cam_in_world_pose)
 
     # Active tracking: tracks marker of interest in world space
-    while True:
-        ret, frame = cam.read()
+    with KaspersMicrobit.find_one_microbit() as microbit:
+        while True:
+            ret, frame = cam.read()
 
-        detections = findArucoMarkers(frame)
-        marker_poses = estimateMarkerPoses(frame, detections[0], detections[1])
+            detections = findArucoMarkers(frame)
+            marker_poses = estimateMarkerPoses(frame, detections[0], detections[1])
 
-        cv2.imshow("Active Tracking Feed", frame)
-        if cv2.waitKey(1) & 0xFF == ord("q"):
-            break
+            microbit.uart.send_string("testing...\n")
+
+            cv2.imshow("Active Tracking Feed", frame)
+            if cv2.waitKey(1) & 0xFF == ord("q"):
+                break
+        
+        time.sleep(10)
 
     cam.release()
     cv2.destroyAllWindows()

@@ -1,7 +1,21 @@
-import statistics as stats
+import logging
+import time
 
-cam_poses = [[1, 1, 1, 1], [0, 0, 0, 1]]
+from kaspersmicrobit import KaspersMicrobit
 
-out = [[stats.mean([pose[i] for pose in cam_poses]) for i in range(3)]]
+logging.basicConfig(level=logging.INFO)
 
-print(out)
+with KaspersMicrobit.find_one_microbit() as microbit:
+
+    microbit.uart.send_string("1234\n")
+
+    time.sleep(1)
+
+# from microbit_comms import MicrobitCommunicator
+# import time
+
+# mb_comms = MicrobitCommunicator()
+
+# mb_comms.send_data([0, -1.1, -2, 3.3, 4, 5])
+
+# time.sleep(20)
