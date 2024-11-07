@@ -59,6 +59,30 @@ def get_marker_pos_rel_world(marker_in_cam_pose: list[float], cam_to_world_mat: 
     marker_to_world_mat = np.matmul(marker_to_cam_mat, cam_to_world_mat)
     return list(np.matmul([0, 0, 0, 1], marker_to_world_mat))
 
+# 3D transformation matrix to 3D pose
+def get_pose_from_transform(transform: np.matrix) -> list[float]:
+    pose = [0, 0, 0, 0, 0, 0]
+
+    origin = list(np.matmul([0, 0, 0, 1], transform))
+
+    pose[:3:] = origin[:3:]
+
+    plus_x = list(np.matmul([1, 0, 0, 1], transform))
+    plus_y = list(np.matmul([0, 1, 0, 1], transform))
+    plus_z = list(np.matmul([0, 0, 1, 1], transform))
+
+    x_axis = [plus_x[i] - origin[i] for i in range(3)]
+    y_axis = [plus_y[i] - origin[i] for i in range(3)]
+    z_axis = [plus_z[i] - origin[i] for i in range(3)]
+
+    rx = math.acos(np.dot(x_axis, [1, 0, 0]))
+    ry = math.acos(np.dot(y_axis, [0, 1, 0]))
+    rz = math.acos(np.dot(z_axis, [0, 0, 1]))
+
+    pose[3:6:] = [rx, ry, rz]
+
+    return pose
+
 """
 From:
 {

@@ -11,11 +11,3 @@ with KaspersMicrobit.find_one_microbit() as microbit:
 
     time.sleep(1)
 
-# from microbit_comms import MicrobitCommunicator
-# import time
-
-# mb_comms = MicrobitCommunicator()
-
-# mb_comms.send_data([0, -1.1, -2, 3.3, 4, 5])
-
-# time.sleep(20)
