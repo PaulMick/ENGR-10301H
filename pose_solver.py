@@ -11,9 +11,9 @@ rotation vectors in the form: [rx, ry, rz]
 # 3D translation vector to 3D translation transformation matrix
 def get_trans_matrix(trans_vec: list[float]) -> np.matrix:
     mat = np.identity(4)
-    mat[3, 0] = -trans_vec[0]
-    mat[3, 1] = -trans_vec[1]
-    mat[3, 2] = -trans_vec[2]
+    mat[0, 3] = -trans_vec[0]
+    mat[1, 3] = -trans_vec[1]
+    mat[2, 3] = -trans_vec[2]
     return mat
 
 # 3D rotation vector to 3D rotation transformation matrix
@@ -63,21 +63,21 @@ def get_marker_pos_rel_world(marker_in_cam_pose: list[float], cam_to_world_mat: 
 def get_pose_from_transform(transform: np.matrix) -> list[float]:
     pose = [0, 0, 0, 0, 0, 0]
 
-    origin = list(np.matmul([0, 0, 0, 1], transform))
+    origin = np.matmul(transform, np.matrix([0, 0, 0, 1]).transpose())
 
-    pose[:3:] = origin[:3:]
+    pose[:3:] = [float(origin[0][0]), float(origin[1][0]), float(origin[2][0])]
 
-    plus_x = list(np.matmul([1, 0, 0, 1], transform))
-    plus_y = list(np.matmul([0, 1, 0, 1], transform))
-    plus_z = list(np.matmul([0, 0, 1, 1], transform))
+    plus_x = np.matmul(transform, np.matrix([1, 0, 0, 1]).transpose())
+    plus_y = np.matmul(transform, np.matrix([0, 1, 0, 1]).transpose())
+    plus_z = np.matmul(transform, np.matrix([0, 0, 1, 1]).transpose())
 
-    x_axis = [plus_x[i] - origin[i] for i in range(3)]
-    y_axis = [plus_y[i] - origin[i] for i in range(3)]
-    z_axis = [plus_z[i] - origin[i] for i in range(3)]
+    x_axis = plus_x - origin
+    y_axis = plus_y - origin
+    z_axis = plus_z - origin
 
-    rx = math.acos(np.dot(x_axis, [1, 0, 0]))
-    ry = math.acos(np.dot(y_axis, [0, 1, 0]))
-    rz = math.acos(np.dot(z_axis, [0, 0, 1]))
+    rz = math.acos(np.dot(x_axis.transpose()[0], [1, 0, 0, 0]))
+    ry = math.acos(np.dot(y_axis.transpose()[0], [0, 1, 0, 0]))
+    rx = math.acos(np.dot(z_axis.transpose()[0], [0, 0, 1, 0]))
 
     pose[3:6:] = [rx, ry, rz]
 
