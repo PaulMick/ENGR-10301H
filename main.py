@@ -73,41 +73,6 @@ def estimateMarkerPoses(frame, corners, ids) -> list[dict]:
     return pose_estimations
 
 def main():
-    # Camera location calibration
-    data_points = []
-
-    # Calibration phase: figures out where camera is in world space
-    while len(data_points) < 1000:
-        ret, frame = cam.read()
-
-        detections = findArucoMarkers(frame)
-        marker_poses = estimateMarkerPoses(frame, detections[0], detections[1])
-
-        waymarker_poses = [pose for pose in marker_poses if pose["id"] in waymarker_ids]
-        # print(waymarker_poses)
-
-        cam_poses = []
-        for p in waymarker_poses:
-            marker_in_world_pose = pose_solver.get_dict_pose_as_list(waymarker_world_poses[p["id"]])
-            cam_poses.append(list(np.matmul([0, 0, 0, 1], pose_solver.get_cam_to_world_transform(pose_solver.get_vec_pose_as_list(p), marker_in_world_pose))))
-        # print(cam_poses)
-
-        if len(cam_poses) > 0:
-            avg_cam_pose = [[stats.mean([pose[i] for pose in cam_poses]) for i in range(3)]]
-            # print(avg_cam_pose)
-
-            data_points.append(avg_cam_pose)
-
-        cv2.imshow("Calibration Feed", frame)
-        if cv2.waitKey(1) & 0xFF == ord("q"):
-            break
-
-    cv2.destroyAllWindows()
-
-    # print(data_points)
-    cam_in_world_pose = [[stats.mean([pose[0][i] for pose in data_points]) for i in range(3)]]
-    print(cam_in_world_pose)
-
     # Active tracking: tracks marker of interest in world space
     with KaspersMicrobit.find_one_microbit() as microbit:
         while True:
@@ -115,13 +80,30 @@ def main():
 
             detections = findArucoMarkers(frame)
             marker_poses = estimateMarkerPoses(frame, detections[0], detections[1])
+            waymarker_poses = [pose for pose in marker_poses if pose["id"] in waymarker_ids]
+            marker_of_interest_pose = [pose for pose in marker_poses if pose["id"] == active_marker_id]
+            if len(marker_of_interest_pose) != 0 and len(waymarker_poses) != 0:
+                marker_of_interest_pose = pose_solver.get_vec_pose_as_list(marker_of_interest_pose[0])
 
-            microbit.uart.send_string("testing...\n")
+                robot_positions = []
+
+                for p in waymarker_poses:
+                    waymarker_in_world_pose = pose_solver.get_dict_pose_as_list(waymarker_world_poses[p["id"]])
+                    waymarker_in_camera_pose = pose_solver.get_vec_pose_as_list(p)
+                    dif = [marker_of_interest_pose[i] - waymarker_in_camera_pose[i] for i in range(len(waymarker_in_camera_pose))]
+                    robot_positions.append([dif[i] + waymarker_in_world_pose[i] for i in range(len(dif))])
+
+                # print(f"Robot poses: {[[round(float(val), 2) for val in robot_position] for robot_position in robot_positions]}")
+
+                mean_pose = [stats.mean([robot_positions[j][i] for j in range(len(robot_positions))]) for i in range(6)]
+
+                # print(f"Mean Pose: {[round(float(val), 2) for val in mean_pose]}")
+
+            microbit.uart.send_string(f"{mean_pose[0]},{mean_pose[1]},{mean_pose[2]},{mean_pose[3]},{mean_pose[4]},{mean_pose[5]}\n")
 
             cv2.imshow("Active Tracking Feed", frame)
             if cv2.waitKey(1) & 0xFF == ord("q"):
                 break
-        
         time.sleep(10)
 
     cam.release()
