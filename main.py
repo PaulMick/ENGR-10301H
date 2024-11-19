@@ -8,6 +8,9 @@ import pose_solver
 import platform
 from kaspersmicrobit import KaspersMicrobit
 import time
+import logging
+
+logging.basicConfig(level=logging.INFO)
 
 parser = argparse.ArgumentParser(description = "Tracks a single aruco marker with other markers as points of reference")
 parser.add_argument("settings", help = "settings file to use for tracking")
@@ -97,14 +100,15 @@ def main():
 
                 mean_pose = [stats.mean([robot_positions[j][i] for j in range(len(robot_positions))]) for i in range(6)]
 
-                # print(f"Mean Pose: {[round(float(val), 2) for val in mean_pose]}")
+				# print(f"Mean Pose: {[round(float(val), 2) for val in mean_pose]}")
 
-            microbit.uart.send_string(f"{mean_pose[0]},{mean_pose[1]},{mean_pose[2]},{mean_pose[3]},{mean_pose[4]},{mean_pose[5]}\n")
-
+                microbit.uart.send_string(f"{round(mean_pose[0], 2)},{round(mean_pose[1], 2)},{round(mean_pose[2], 2)},{round(mean_pose[3], 2)},{round(mean_pose[4], 2)},{round(mean_pose[5], 2)}\n")
+				
             cv2.imshow("Active Tracking Feed", frame)
             if cv2.waitKey(1) & 0xFF == ord("q"):
                 break
-        time.sleep(10)
+                
+        time.sleep(1)
 
     cam.release()
     cv2.destroyAllWindows()

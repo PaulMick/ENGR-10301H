@@ -7,7 +7,11 @@ logging.basicConfig(level=logging.INFO)
 
 with KaspersMicrobit.find_one_microbit() as microbit:
 
-    microbit.uart.send_string("1234\n")
+    i = 0
+    while i < 100:
+        microbit.uart.send_string(f"{i},p\n")
+        i += 1
+        time.sleep(0.25)
 
     time.sleep(1)
 
