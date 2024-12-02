@@ -62,6 +62,8 @@ Run the calibration and settings generation script:
 python generate_settings.py
 ```
 
+Tip: To help check for errors in the creation of a settings file, view a 3D model of your marker setup with `python visualize_settings.py settings_name`.
+
 ## Camera Calibration
 
 If the camera has not been calibrated, enter "`y`" when asked whether to calibrate camera.
@@ -84,5 +86,14 @@ After entering all of the waypoint marker information, provide a name for the se
 
 The new settings file should be created under `./settings`.
 
+# Active Tracking and Connectivity
+
+To enable bluetooth connectivity on the Micro:bit desired for pose data streaming, flash the Micro:bit with [this MakeCode project](https://makecode.microbit.org/_Rhe5vuaVr1FX) from the amazingly helpful open source project [Kasper's microbit](https://kaspersmicrobit.readthedocs.io/en/stable/).
+
+Ensure the tracking module is in an orientation to view the entire desired tracking area.
+
+Next, run the actual active tracking with `python main.py settings_name`. The tracking module will track the marker of interest in space and transmit that data continuously to the Micro:bit.
+
 Credits/Sources/Resources:
 [https://forums.raspberrypi.com/viewtopic.php?t=331441](https://forums.raspberrypi.com/viewtopic.php?t=331441)
+[https://kaspersmicrobit.readthedocs.io/en/stable/](https://kaspersmicrobit.readthedocs.io/en/stable/)
